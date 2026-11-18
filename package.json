@@ -1,0 +1,78 @@
+{
+  "name": "kontext-workspace",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Lokaler Workspace für Browser-Chats, Projekte und einen Sprachassistenten.",
+  "author": "Kontext Workspace",
+  "type": "module",
+  "main": "desktop/main.mjs",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "desktop": "npm run build && electron .",
+    "package:linux": "npm run build && electron-builder --linux AppImage",
+    "package:windows": "npm run build && electron-builder --win nsis",
+    "extension:zip": "node scripts/package-extension.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.2.0",
+    "@fontsource-variable/jetbrains-mono": "^5.2.0",
+    "highlight.js": "^11.11.1",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "electron": "^42.0.0",
+    "electron-builder": "^26.11.0",
+    "fflate": "^0.8.2",
+    "linkedom": "^0.18.12",
+    "vite": "^7.3.1"
+  },
+  "build": {
+    "appId": "app.kontext.workspace",
+    "productName": "Kontext",
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "dist/**",
+      "desktop/**",
+      "server/**",
+      "assets/icon.png",
+      "!node_modules{,/**/*}"
+    ],
+    "extraResources": [
+      {
+        "from": "extension",
+        "to": "chrome-extension"
+      },
+      {
+        "from": "scripts/speech_server.py",
+        "to": "speech_server.py"
+      }
+    ],
+    "linux": {
+      "target": "AppImage",
+      "category": "Utility",
+      "icon": "assets/icon.png"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
