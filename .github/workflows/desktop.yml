@@ -1,0 +1,45 @@
+name: Build Kontext
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux
+            artifact: Kontext-Linux
+            files: |
+              release/*.AppImage
+              release/kontext-chrome.zip
+          - os: windows-latest
+            target: windows
+            artifact: Kontext-Windows
+            files: release/*.exe
+    runs-on: ${{ matrix.os }}
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run package:${{ matrix.target }} -- --publish never
+      - if: matrix.target == 'linux'
+        run: npm run extension:zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
